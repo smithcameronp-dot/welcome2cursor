@@ -49,6 +49,7 @@ For a full code + data reset, check out the project's tagged baseline (e.g. `dem
 
 | Project | Description | Stack |
 |---------|-------------|-------|
+| **[Fantasy GM](fantasy-gm/)** | Fantasy football chat assistant backed by the xAI Grok Responses API, with a Live Search toggle for real-time injury news | Next.js, xAI Grok, Vitest |
 | **Beacon** *(coming soon)* | Linear-style issue tracker with board, list, and detail views | Next.js, Prisma, SQLite |
 
 Each project includes:
@@ -80,6 +81,7 @@ See each project's `DEMO.md` for exact prompts and durations.
 ```
 welcome2cursor/
 ├── README.md          ← you are here
+├── fantasy-gm/        ← Grok-powered fantasy football assistant
 ├── beacon/            ← issue tracker demo (planned)
 ├── rules/             ← shared Cursor rules for demos (planned)
 └── skills/            ← demo-specific agent skills (planned)
