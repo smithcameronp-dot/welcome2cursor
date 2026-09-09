@@ -13,6 +13,17 @@ pnpm dev
 
 Open http://localhost:3000. If `XAI_API_KEY` is missing, the app loads and tells you so rather than failing silently.
 
+### Running without a key
+
+`scripts/mock-xai.mjs` stands in for `api.x.ai`, serving the same SSE event shape word by word. Useful for demoing the UI, or for debugging the stream without spending credits.
+
+```bash
+pnpm mock:xai    # terminal 1
+pnpm dev:mock    # terminal 2
+```
+
+The mock varies its answer based on whether the request asked for search tools, so the Live Search toggle is visibly different in both positions.
+
 ## Configuration
 
 | Variable       | Required | Default              | Purpose                                          |

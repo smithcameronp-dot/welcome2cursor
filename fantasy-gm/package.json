@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:mock": "XAI_API_KEY=mock-key XAI_BASE_URL=http://127.0.0.1:8787/v1 next dev",
+    "mock:xai": "node scripts/mock-xai.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

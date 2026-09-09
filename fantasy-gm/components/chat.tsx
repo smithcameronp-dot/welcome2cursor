@@ -13,6 +13,7 @@ import { SUGGESTED_QUESTIONS } from "@/lib/prompt";
 import { createEventParser } from "@/lib/protocol";
 
 import { Answer } from "./answer";
+import { Football } from "./football";
 import { LiveSearchToggle } from "./live-search-toggle";
 
 const MAX_TEXTAREA_HEIGHT = 200;
@@ -163,12 +164,7 @@ export function Chat() {
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4">
       <header className="flex items-center justify-between gap-4 border-b border-turf-700 py-5">
         <div className="flex items-center gap-3">
-          <span
-            aria-hidden
-            className="grid size-10 place-items-center rounded-full bg-gradient-to-b from-pigskin to-[#8a4b06] text-lg shadow-lg shadow-black/40"
-          >
-            <span className="block h-4 w-0.5 rounded bg-chalk" />
-          </span>
+          <Football className="size-10 drop-shadow-lg drop-shadow-black/40" />
           <div>
             <h1 className="text-lg leading-tight font-semibold tracking-tight">
               Fantasy GM
@@ -193,9 +189,9 @@ export function Chat() {
         </p>
       ) : null}
 
-      <div className="scrollbar-turf flex-1 overflow-y-auto py-6">
+      <div className="scrollbar-turf flex flex-1 flex-col overflow-y-auto py-6">
         {isEmpty ? (
-          <div className="space-y-5">
+          <div className="my-auto space-y-5">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">
                 What are we deciding this week?

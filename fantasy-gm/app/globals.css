@@ -35,8 +35,8 @@ body {
       to right,
       transparent 0,
       transparent calc(5rem - 1px),
-      rgba(242, 247, 243, 0.035) calc(5rem - 1px),
-      rgba(242, 247, 243, 0.035) 5rem
+      rgba(242, 247, 243, 0.055) calc(5rem - 1px),
+      rgba(242, 247, 243, 0.055) 5rem
     ),
     radial-gradient(60rem 30rem at 50% -10rem, rgba(34, 197, 94, 0.14), transparent);
   background-attachment: fixed;
