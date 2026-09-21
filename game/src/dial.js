@@ -1,9 +1,9 @@
 export const DIALS = {
-  fastball: { start: 0.64, end: 0.8, ms: 920 },
-  sinker: { start: 0.5, end: 0.68, ms: 1080 },
-  slider: { start: 0.4, end: 0.58, ms: 1220 },
-  curve: { start: 0.28, end: 0.48, ms: 1420 },
-  changeup: { start: 0.16, end: 0.36, ms: 1560 },
+  fastball: { start: 0.58, end: 0.78, ms: 1800 },
+  sinker: { start: 0.48, end: 0.7, ms: 2100 },
+  slider: { start: 0.4, end: 0.62, ms: 2400 },
+  curve: { start: 0.3, end: 0.54, ms: 2700 },
+  changeup: { start: 0.18, end: 0.42, ms: 3000 },
 };
 
 export function gradeDial(type, position) {

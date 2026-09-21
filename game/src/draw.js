@@ -220,7 +220,7 @@ export function drawMound(ctx, w, h, { walk = 1, manager = null, ballWith = "pit
     ctx.lineTo(manager.x * w, manager.y * h);
     ctx.stroke();
     ctx.setLineDash([]);
-    drawFigure(ctx, manager.x * w, manager.y * h, 60, "#d4652f", "#1a1408");
+    drawFigure(ctx, manager.x * w, manager.y * h, 60, "#ff7a3c", "#1a1408");
   }
 
   if (opponent) {

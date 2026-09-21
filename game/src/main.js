@@ -201,11 +201,15 @@ function startDial(location) {
   dialing = true;
   dialPosition = 0;
   const dial = DIALS[pitchType];
-  const started = performance.now();
+  let last = performance.now();
   $("stop").disabled = false;
   $("call").textContent = "Stop the dial";
   const frame = (now) => {
-    dialPosition = Math.min(1, (now - started) / dial.ms);
+    if (!dialing) return;
+    // A hidden tab delivers one late frame. Cap it so the needle does not skip the window.
+    const step = Math.min(40, Math.max(0, now - last));
+    last = now;
+    dialPosition = Math.min(1, dialPosition + step / dial.ms);
     moveNeedle(dialPosition);
     if (dialPosition >= 1) release(location, null);
     else dialTimer = requestAnimationFrame(frame);
@@ -220,22 +224,24 @@ function release(location, position) {
   dialing = false;
   cancelAnimationFrame(dialTimer);
   $("stop").disabled = true;
-  const graded = gradeDial(pitchType, position);
-  const before = outing;
-  const step = resolvePitch(
-    outing,
-    currentBatter(team, outing),
-    { type: pitchType, location, error: graded.error, late: graded.late },
-    rng,
-  );
-  outing = step.state;
-  const text = callText(step.outcome, before, outing);
-  $("call").textContent = text;
-  renderScore();
-  renderBatter();
-  pitchType = null;
-  renderPitches();
-  window.setTimeout(() => finishPitch(text), 700);
+  try {
+    const graded = gradeDial(pitchType, position);
+    const before = outing;
+    const step = resolvePitch(
+      outing,
+      currentBatter(team, outing),
+      { type: pitchType, location, error: graded.error, late: graded.late },
+      rng,
+    );
+    outing = step.state;
+    $("call").textContent = callText(step.outcome, before, outing);
+    renderScore();
+    renderBatter();
+  } finally {
+    pitchType = null;
+    renderPitches();
+    window.setTimeout(() => finishPitch(), 1100);
+  }
 }
 
 function callText(outcome, before, after) {
@@ -257,7 +263,6 @@ function finishPitch() {
     showResult();
     return;
   }
-  $("call").textContent = "Call a pitch";
   for (const cell of $("zone").children) cell.classList.remove("picked");
 }
 
@@ -348,11 +353,13 @@ const params = new URLSearchParams(location.search);
 const preview = params.get("preview");
 if (preview === "mound") {
   team = teamById(params.get("team") || "otters");
-  outing = createOuting(mulberry32(7));
+  rng = mulberry32(7);
+  outing = createOuting(rng);
   openGame();
 } else if (preview === "intro" || preview === "hook") {
   team = teamById("otters");
-  outing = createOuting(mulberry32(7));
+  rng = mulberry32(7);
+  outing = createOuting(rng);
   if (preview === "hook") {
     outing = { ...outing, hits: 11, runs: 4, outs: 12, hooked: true, finished: true };
   }
