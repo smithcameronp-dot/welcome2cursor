@@ -14,7 +14,7 @@ python3 -m http.server 8765
 
 Open `http://127.0.0.1:8765` in a landscape window. Choose a club, watch the entrance, then pitch.
 
-`?preview=intro` replays the dugout run. `?preview=hook` replays the manager's walk.
+`?preview=intro` replays the dugout run. `?preview=hook` replays the manager's walk. `?preview=mound` skips the entrance and opens the at-bat.
 
 ## Test
 
