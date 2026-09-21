@@ -50,6 +50,7 @@ For a full code + data reset, check out the project's tagged baseline (e.g. `dem
 | Project | Description | Stack |
 |---------|-------------|-------|
 | **Beacon** *(coming soon)* | Linear-style issue tracker with board, list, and detail views | Next.js, Prisma, SQLite |
+| **Game** *(planning)* | Browser game. See `game/PLAN.md` before any code. | Not chosen yet |
 
 Each project includes:
 
@@ -81,6 +82,7 @@ See each project's `DEMO.md` for exact prompts and durations.
 welcome2cursor/
 ├── README.md          ← you are here
 ├── beacon/            ← issue tracker demo (planned)
+├── game/              ← browser game (planning)
 ├── rules/             ← shared Cursor rules for demos (planned)
 └── skills/            ← demo-specific agent skills (planned)
 ```
