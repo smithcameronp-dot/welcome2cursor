@@ -1,50 +1,54 @@
-# Game plan
+# Bullpen Save
 
-Working plan. Proposals below are a starting position, not locked decisions.
+Locked rules for the playable build in this folder.
 
-## Fit for this repo
+Bullpen Save uses the Bullpen Blast pitching loop: pick a pitch, pick a spot, stop a speed dial. The card layout (pitcher on the left, batter ratings and tendencies on the right, view from behind the mound) follows the broadcast screenshot we used as reference. Names, uniforms, and parks are original. No Nabisco, MLB, Topps, or The Show marks.
 
-This repo is a set of self-contained demo projects. The game should match that:
+## Outing
 
-- One folder, no shared app dependencies.
-- Runs in the browser. No accounts, no database, no server.
-- A first playable slice that a person can finish in a few minutes.
-- Safe to delete and recreate between demos.
+You pitch until you record 27 outs or the manager pulls you. Outs are strikeouts, groundouts, and flyouts. A perfect game is 27 outs with zero hits, zero walks, and zero hit-by-pitches.
 
-## Recommended first slice
+Hits do not end the outing by themselves. Fair contact is either an out or a hit. There is no fielding minigame and no baserunning minigame. Each inning remembers how many runners are on, from 0 to 3.
 
-A single-screen arcade game: one verb, one fail state, one score.
+- A single, or a walk, adds a runner and scores one if the bases were already full.
+- A hard hit scores everyone who was on and leaves a runner.
+- A home run scores everyone, including the batter, and clears the bases.
+- Three outs clear the bases.
 
-That shape is small enough to build and play in one pass, and it still leaves room for a second slice (levels, enemies, or a twist) after the core feels good.
+The manager comes out after a play with **11 hits** or **7 runs**. He walks from the dugout, along the foul line, to the mound, and takes the ball. The outing ends. Ten hits and six runs do not bring him out.
 
-Trade-off: a story game, RPG, or anything with menus and persistence will not fit this first slice. If that is the game we actually want, we should say so before building and drop the arcade constraint.
+## Result odds
 
-## Decisions still open
+These are the chances for one outing at average execution: the release window is hit about half the time, locations are mixed, and pitch type is not matched to the batter. The written ranges shared the 5-hit and 10-hit edges. Five stays in the 1–5 band. Ten stays in the 6–10 band.
 
-Fill these in before implementation.
+- Perfect game: 2%
+- 1–5 hits: 20%
+- 6–10 hits: 33%
+- 11 or more hits, which ends on the hook: 45%
 
-| Decision | Proposal | Locked |
-| --- | --- | --- |
-| Working title | Untitled | No |
-| Player fantasy | One clear action, repeated under pressure | No |
-| Genre | Single-screen arcade | No |
-| Win condition | Survive or reach a score | No |
-| Lose condition | One hit, or a timer | No |
-| Controls | Keyboard, mouse optional | No |
-| Session length | 1–3 minutes | No |
-| Art | Simple shapes, no asset pack | No |
-| Audio | Optional, off by default | No |
+A hidden mix of rough, ordinary, and sharp days produces that spread. The dial and the pitch you call move a given day. Top-of-the-order hitters are more dangerous than the 8 and 9 holes on the same pitch.
 
-## Build order, once the table is locked
+## Pitch
 
-1. Playable loop: start, act, fail, restart. No menus.
-2. Scoring and a visible goal.
-3. One piece of juice (screen shake, flash, or a rising difficulty).
-4. Only then: extra mechanics.
+1. Type: fastball, sinker, slider, curve, changeup. Each has its own release window.
+2. Location: tap the zone over the plate, including the chase ring.
+3. Dial: stop the needle inside the window. Early misses dive. Late misses hang. Letting the needle finish is the worst miss.
 
-## Out of scope until the loop is fun
+## Clubs
 
-- Accounts, saves, leaderboards
-- Level editors
-- Multiple characters or a story mode
-- A build pipeline heavier than a static page
+Real cities, fictional names. The pitcher is Cole Brant of the San Antonio Gulls.
+
+- Austin Otters
+- Portland Locks
+- Nashville Echoes
+- Buffalo Steel
+
+Lineups are nine fictional batters: table-setters at 1–2, the best hitters at 3–5, ordinary at 6–7, weaker at 8–9.
+
+## Entrance
+
+Before the first pitch, Brant comes out of the dugout under overhead cameras that orbit the park. Pump-up music plays for that run. He sprints the chalk, jumps off the basepath, and walks to the mound as the camera settles behind him.
+
+## Out of scope
+
+Accounts, saves, a season, baserunning controls, and a native SwiftUI port. This build is a landscape touch page so it can be played in a browser.
