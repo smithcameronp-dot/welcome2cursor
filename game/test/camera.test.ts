@@ -10,7 +10,7 @@ describe("gameplay camera", () => {
     expect(rig.pos.y).toBeCloseTo(1.98);
     expect(rig.pos.x).toBeGreaterThan(0);
     expect(rig.look.z).toBeLessThan(1);
-    expect(rig.look.y).toBeGreaterThan(0.5);
+    expect(rig.look.y).toBeGreaterThan(0.3);
     expect(rig.pos.z).toBeGreaterThan(FIELD.moundToPlate);
   });
 });

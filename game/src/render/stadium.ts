@@ -304,7 +304,7 @@ function addZone(scene: Scene) {
   const h = FIELD.zoneTop - FIELD.zoneBottom;
   const zone = new Mesh(
     new BoxGeometry(w, h, 0.02),
-    new MeshBasicMaterial({ color: "#e2b15a", transparent: true, opacity: 0.12, depthWrite: false }),
+    new MeshBasicMaterial({ color: "#e2b15a", transparent: true, opacity: 0.22, depthWrite: false }),
   );
   zone.position.set(0, FIELD.zoneBottom + h / 2, 0.18);
   scene.add(zone);

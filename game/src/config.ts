@@ -120,7 +120,7 @@ export const CAMERA = {
   gameplayBack: 3.05,
   gameplayHeight: 1.98,
   gameplayOffCenter: 0.42,
-  lookHeight: 0.8,
+  lookHeight: 0.48,
   handheldPx: 0.8,
   releaseWhipDeg: 2.5,
   releaseWhipMs: 150,
@@ -129,16 +129,16 @@ export const CAMERA = {
 } as const;
 
 export const LIGHTING = {
-  exposure: 1.08,
-  sunIntensity: 2.4,
-  sunColor: "#ffd2a0",
-  hemiSky: "#c4def5",
-  hemiGround: "#6d7a52",
-  hemiIntensity: 0.72,
+  exposure: 1.22,
+  sunIntensity: 2.7,
+  sunColor: "#ffd6a8",
+  hemiSky: "#d2e6f8",
+  hemiGround: "#7a8458",
+  hemiIntensity: 0.95,
   sun: { x: -38, y: 16, z: 32 },
-  fog: "#c8dbea",
-  fogNear: 90,
-  fogFar: 240,
+  fog: "#d2e3f0",
+  fogNear: 120,
+  fogFar: 260,
 } as const;
 
 export const CUTSCENE = {
