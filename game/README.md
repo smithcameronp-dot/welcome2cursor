@@ -1,34 +1,35 @@
-# Bullpen Save
+# Bullpen Blast
 
-Landscape pitching game in a 3D park. Throw a perfect game, or stay in long enough that the manager leaves you on the mound.
+Pitch a full 9 innings. Chase a perfect game.
 
-You pick the pitch, the location, and when the speed dial stops. Twenty-seven outs with no hits and no walks is a perfect game. Eleven hits or seven runs and the manager walks out and takes the ball.
-
-## Play
-
-From this folder:
-
-```bash
-python3 -m http.server 8765
-```
-
-Open `http://127.0.0.1:8765` in a landscape window. Choose a club, watch the entrance, then pitch.
-
-`?preview=intro` replays the dugout run. `?preview=hook` replays the manager's walk. `?preview=mound` skips the entrance and opens the at-bat.
-
-## Test
+Phase 2 is the **behind-the-pitcher camera** and park. No characters yet.
 
 ```bash
 npm test
+npm run dev
 ```
 
-The suite checks the count, the hook thresholds, and that average pitching lands near the published hit odds (perfect 2%, 1–5 hits 20%, 6–10 hits 33%, 11 or more 45%).
+Open `http://127.0.0.1:5173` for the gameplay camera. `legacy.html` is the old dial preview.
 
 ## Layout
 
-- `PLAN.md` — locked rules
-- `data/teams.js` — Gulls pitcher and the four lineups
-- `src/resolve.js` — pitch outcomes, runs, and the hook
-- `src/park.js` — 3D park, cameras, ball flight
-- `src/look.js` — uniforms, crowd, and stadium textures
-- `index.html` — the mound screen
+- `ARCHITECTURE.md` — coordinates and trajectory math
+- `src/config.ts` — every tuning number
+- `src/game/` — physics, mouse gesture, batter AI, 9-inning rules
+- `src/data/teams.ts` — Gulls vs fictional clubs
+- `src/render/` — phase 2
+- `src/ui/` — phase 5
+
+## Mixamo clip names
+
+Retarget onto `/assets/models/pitcher.glb`, `batter.glb`, `catcher.glb`, `umpire.glb`.
+
+Pitcher: `idle_set`, `windup_delivery`, `follow_through`, `walk_off_mound`, `fist_pump`, `hat_tip`, `step_up_stairs`, `confident_walk`, `toss_ball_idle`, `step_on_rubber`
+
+Catcher: `crouch_idle`, `receive`, `throw_back`
+
+Batter: `stance_L`, `stance_R`, `swing`, `check_swing`, `take`, `flinch_inside`, `look_back_at_ump`, `walk_to_box`
+
+Umpire: `idle`, `call_ball`, `call_strike`, `ring_up_k`
+
+Crossfade 300 ms. Root motion on cutscene walks.

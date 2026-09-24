@@ -1,11 +1,21 @@
 {
-  "name": "bullpen-save",
+  "name": "bullpen-blast",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "@types/three": "^0.186.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
   },
   "dependencies": {
-    "three": "^0.160.0"
+    "three": "^0.186.1"
   }
 }
