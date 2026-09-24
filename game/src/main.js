@@ -1,7 +1,7 @@
 import { TENDENCY_LABELS, pitcher, teamById, teams } from "../data/teams.js";
 import { createPump } from "./audio.js";
 import { DIALS, dialPoint, gradeDial } from "./dial.js";
-import { playScene } from "./intro.js";
+import { createPark } from "./park.js";
 import {
   createOuting,
   currentBatter,
@@ -12,10 +12,9 @@ import {
 
 const $ = (id) => document.getElementById(id);
 const menu = $("menu");
-const scene = $("scene");
-const game = $("game");
+const stage = $("stage");
 const result = $("result");
-const canvas = $("scene-canvas");
+const canvas = $("gl");
 
 const LABELS = {
   ball: "Ball",
@@ -36,7 +35,7 @@ let team = null;
 let outing = null;
 let rng = null;
 let pitchType = null;
-let stopScene = null;
+let park = null;
 let pump = null;
 let audioCtx = null;
 let dialTimer = 0;
@@ -45,9 +44,22 @@ let dialing = false;
 let resolving = false;
 
 function show(el) {
-  for (const section of [menu, scene, game, result]) {
-    section.hidden = section !== el;
+  menu.hidden = el !== menu;
+  stage.hidden = el !== stage;
+  result.hidden = el !== result;
+}
+
+function ensurePark() {
+  if (!park) {
+    park = createPark(canvas);
+    requestAnimationFrame(() => park.resize());
   }
+  return park;
+}
+
+function setMode(mode) {
+  stage.className = mode;
+  $("cam-bug").hidden = mode === "pitching";
 }
 
 function audio() {
@@ -70,9 +82,7 @@ function renderTeams() {
 }
 
 function renderPitcher() {
-  const card = $("pitcher-card");
-  card.replaceChildren();
-  card.innerHTML = `
+  $("pitcher-card").innerHTML = `
     <p class="eyebrow">${pitcher.city}</p>
     <h3>${pitcher.name}</h3>
     <p class="meta">${pitcher.club} · Throws ${pitcher.throws}</p>
@@ -82,7 +92,6 @@ function renderPitcher() {
 
 function renderBatter() {
   const batter = currentBatter(team, outing);
-  const card = $("batter-card");
   const bars = [
     ["POW", batter.pow, "#e07a3d"],
     ["CON", batter.con, "#d6c15a"],
@@ -101,13 +110,14 @@ function renderBatter() {
   const tags = batter.tendencies
     .map((id) => `<span>${TENDENCY_LABELS[id] ?? id}</span>`)
     .join("");
-  card.innerHTML = `
+  $("batter-card").innerHTML = `
     <p class="eyebrow">${team.city} ${team.name}</p>
     <h3>${batter.name}</h3>
     <p class="meta">Bats ${batter.bats} · No. ${(outing.batterIndex % 9) + 1}</p>
     ${bars}
     <div class="tags">${tags}</div>
   `;
+  ensurePark().setBatterHand(batter.bats);
 }
 
 function renderScore() {
@@ -158,10 +168,8 @@ function renderZone() {
 
 function paintWindow(type) {
   const dial = DIALS[type] ?? DIALS.fastball;
-  const track = arc(0, 1);
-  const windowArc = arc(dial.start, dial.end);
-  $("dial-track").setAttribute("d", track);
-  $("dial-window").setAttribute("d", windowArc);
+  $("dial-track").setAttribute("d", arc(0, 1));
+  $("dial-window").setAttribute("d", arc(dial.start, dial.end));
   moveNeedle(0);
 }
 
@@ -173,9 +181,8 @@ function arc(from, to) {
 
 function moveNeedle(position) {
   const tip = dialPoint(Math.max(0, Math.min(1, position)), 74);
-  const needle = $("dial-needle");
-  needle.setAttribute("x2", String(tip.x));
-  needle.setAttribute("y2", String(tip.y));
+  $("dial-needle").setAttribute("x2", String(tip.x));
+  $("dial-needle").setAttribute("y2", String(tip.y));
 }
 
 function choosePitch(id) {
@@ -206,7 +213,6 @@ function startDial(location) {
   $("call").textContent = "Stop the dial";
   const frame = (now) => {
     if (!dialing) return;
-    // A hidden tab delivers one late frame. Cap it so the needle does not skip the window.
     const step = Math.min(40, Math.max(0, now - last));
     last = now;
     dialPosition = Math.min(1, dialPosition + step / dial.ms);
@@ -218,29 +224,40 @@ function startDial(location) {
   $("stop").onclick = () => release(location, dialPosition);
 }
 
-function release(location, position) {
+async function release(location, position) {
   if (resolving) return;
   resolving = true;
   dialing = false;
   cancelAnimationFrame(dialTimer);
   $("stop").disabled = true;
+  const type = pitchType;
+  const batter = currentBatter(team, outing);
   try {
-    const graded = gradeDial(pitchType, position);
+    const graded = gradeDial(type, position);
     const before = outing;
     const step = resolvePitch(
       outing,
-      currentBatter(team, outing),
-      { type: pitchType, location, error: graded.error, late: graded.late },
+      batter,
+      { type, location, error: graded.error, late: graded.late },
       rng,
     );
     outing = step.state;
+    $("call").textContent = "";
+    await ensurePark().throwPitch({
+      type,
+      location,
+      error: graded.error,
+      late: graded.late,
+      outcome: step.outcome,
+      bats: batter.bats,
+    });
     $("call").textContent = callText(step.outcome, before, outing);
     renderScore();
     renderBatter();
   } finally {
     pitchType = null;
     renderPitches();
-    window.setTimeout(() => finishPitch(), 1100);
+    window.setTimeout(() => finishPitch(), 900);
   }
 }
 
@@ -252,13 +269,15 @@ function callText(outcome, before, after) {
   return LABELS[outcome] ?? "Pitch";
 }
 
-function finishPitch() {
-  resolving = false;
+async function finishPitch() {
   if (outing.hooked) {
     $("call").textContent = "Here comes the manager";
-    runScene("hook", () => showResult());
+    await runHook();
+    showResult();
+    resolving = false;
     return;
   }
+  resolving = false;
   if (outing.finished) {
     showResult();
     return;
@@ -268,19 +287,16 @@ function finishPitch() {
 
 function showResult() {
   show(result);
-  const kicker = $("result-kicker");
-  const title = $("result-title");
-  const line = $("result-line");
-  kicker.textContent = `${team.city} ${team.name}`;
+  $("result-kicker").textContent = `${team.city} ${team.name}`;
   if (outing.perfect) {
-    title.textContent = "Perfect game";
-    line.textContent = `${formatInnings(outing.outs)} innings, no hits, no walks.`;
+    $("result-title").textContent = "Perfect game";
+    $("result-line").textContent = `${formatInnings(outing.outs)} innings, no hits, no walks.`;
   } else if (outing.hooked) {
-    title.textContent = "Pulled";
-    line.textContent = `The manager took the ball after ${formatInnings(outing.outs)} innings, ${outing.hits} hits, and ${outing.runs} runs.`;
+    $("result-title").textContent = "Pulled";
+    $("result-line").textContent = `The manager took the ball after ${formatInnings(outing.outs)} innings, ${outing.hits} hits, and ${outing.runs} runs.`;
   } else {
-    title.textContent = outing.hits === 0 ? "No hits" : `${outing.hits} hits`;
-    line.textContent = `${formatInnings(outing.outs)} innings, ${outing.runs} runs, ${outing.walks} walks. Not a perfect game.`;
+    $("result-title").textContent = outing.hits === 0 ? "No hits" : `${outing.hits} hits`;
+    $("result-line").textContent = `${formatInnings(outing.outs)} innings, ${outing.runs} runs, ${outing.walks} walks. Not a perfect game.`;
   }
 }
 
@@ -290,11 +306,14 @@ function startOuting(club) {
   outing = createOuting(rng);
   pitchType = null;
   resolving = false;
-  runScene("intro", () => openGame());
+  runIntro().then(() => openGame());
 }
 
 function openGame() {
-  show(game);
+  show(stage);
+  setMode("pitching");
+  ensurePark().setPitchingView();
+  ensurePark().resize();
   renderPitcher();
   renderBatter();
   renderScore();
@@ -305,30 +324,38 @@ function openGame() {
   $("stop").disabled = true;
 }
 
-function runScene(mode, onDone) {
-  show(scene);
+async function runIntro() {
+  show(stage);
+  setMode("intro");
+  $("call").textContent = "Cole Brant takes the mound";
+  $("cam-bug").textContent = "CAM 1";
   if (pump) {
     pump.stop();
     pump = null;
   }
-  let mix = null;
-  if (mode === "intro") {
-    mix = createPump(audio());
-    pump = mix;
-  }
-  stopScene = playScene(canvas, {
-    mode,
-    opponent: `${team.city} ${team.name}`,
-    audio: mix,
-    onDone: () => {
-      stopScene = null;
-      onDone();
+  pump = createPump(audio());
+  ensurePark().resize();
+  await ensurePark().playIntro({
+    onCam(label) {
+      $("cam-bug").textContent = label;
     },
   });
+  if (pump) {
+    pump.fade();
+    pump = null;
+  }
+}
+
+async function runHook() {
+  show(stage);
+  setMode("hook");
+  $("cam-bug").hidden = false;
+  $("cam-bug").textContent = "CAM 3";
+  await ensurePark().playHook();
 }
 
 $("skip").addEventListener("click", () => {
-  if (stopScene) stopScene();
+  ensurePark().skip();
 });
 
 $("again").addEventListener("click", () => {
@@ -336,7 +363,7 @@ $("again").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-  if (game.hidden) return;
+  if (stage.hidden || stage.className !== "pitching") return;
   const index = Number(event.key) - 1;
   if (index >= 0 && index < pitcher.pitches.length) {
     choosePitch(pitcher.pitches[index].id);
@@ -365,17 +392,16 @@ if (preview === "mound") {
   }
   const at = params.get("at");
   if (at != null) {
-    show(scene);
-    playScene(canvas, {
-      mode: preview,
-      opponent: `${team.city} ${team.name}`,
-      still: Number(at),
-      onDone() {},
-    });
+    show(stage);
+    setMode(preview);
+    ensurePark();
+    if (preview === "intro") ensurePark().seekIntro(Number(at));
+    else ensurePark().seekHook(Number(at));
+    $("call").textContent = preview === "intro" ? "Cole Brant takes the mound" : "Here comes the manager";
+    $("cam-bug").textContent = preview === "hook" ? "CAM 3" : "CAM 2";
+  } else if (preview === "hook") {
+    runHook().then(() => showResult());
   } else {
-    runScene(preview, () => {
-      if (preview === "hook") showResult();
-      else openGame();
-    });
+    runIntro().then(() => openGame());
   }
 }

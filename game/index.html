@@ -18,35 +18,19 @@
         <div id="teams" class="team-list"></div>
       </section>
 
-      <section id="scene" hidden>
-        <canvas id="scene-canvas"></canvas>
-        <button id="skip" type="button">Skip</button>
-      </section>
-
-      <section id="game" hidden>
+      <section id="stage" hidden>
+        <canvas id="gl"></canvas>
         <header class="scorebug">
+          <span id="cam-bug" class="cam-bug" hidden>CAM 1</span>
           <span id="inning">Inning 1</span>
           <span id="count" class="count"></span>
           <span id="line"></span>
           <span id="perfect" class="perfect">Perfect</span>
         </header>
-        <div class="diamond">
-          <aside id="pitcher-card" class="card"></aside>
-          <div class="field">
-            <div class="stands"></div>
-            <div class="grass"></div>
-            <div class="dirt"></div>
-            <div class="mound"></div>
-            <div class="chalk chalk-left"></div>
-            <div class="chalk chalk-right"></div>
-            <div class="batter-fig" aria-hidden="true"></div>
-            <div class="catcher-fig" aria-hidden="true"></div>
-            <div class="pitcher-fig" aria-hidden="true"></div>
-            <div id="zone" class="zone"></div>
-            <p id="call" aria-live="polite"></p>
-          </div>
-          <aside id="batter-card" class="card"></aside>
-        </div>
+        <aside id="pitcher-card" class="card card-left"></aside>
+        <aside id="batter-card" class="card card-right"></aside>
+        <div id="zone" class="zone"></div>
+        <p id="call" aria-live="polite"></p>
         <footer class="dock">
           <div id="pitches" class="pitches"></div>
           <div class="dial-wrap">
@@ -58,6 +42,7 @@
             <button id="stop" type="button" disabled>Stop</button>
           </div>
         </footer>
+        <button id="skip" type="button">Skip</button>
       </section>
 
       <section id="result" hidden>

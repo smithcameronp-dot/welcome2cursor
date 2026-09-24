@@ -2,7 +2,7 @@
 
 Locked rules for the playable build in this folder.
 
-Bullpen Save uses the Bullpen Blast pitching loop: pick a pitch, pick a spot, stop a speed dial. The card layout (pitcher on the left, batter ratings and tendencies on the right, view from behind the mound) follows the broadcast screenshot we used as reference. Names, uniforms, and parks are original. No Nabisco, MLB, Topps, or The Show marks.
+The field is a 3D park from behind the mound: camera on the rubber, a ball that travels, pitch break, and a manager who walks out in the same world. HUD cards sit over that view. Geometry is original. No MLB or The Show marks.
 
 ## Outing
 

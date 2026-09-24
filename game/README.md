@@ -1,6 +1,6 @@
 # Bullpen Save
 
-Landscape pitching game. Throw a perfect game, or stay in long enough that the manager leaves you on the mound.
+Landscape pitching game in a 3D park. Throw a perfect game, or stay in long enough that the manager leaves you on the mound.
 
 You pick the pitch, the location, and when the speed dial stops. Twenty-seven outs with no hits and no walks is a perfect game. Eleven hits or seven runs and the manager walks out and takes the ball.
 
@@ -29,5 +29,5 @@ The suite checks the count, the hook thresholds, and that average pitching lands
 - `PLAN.md` — locked rules
 - `data/teams.js` — Gulls pitcher and the four lineups
 - `src/resolve.js` — pitch outcomes, runs, and the hook
-- `src/draw.js`, `src/intro.js`, `src/audio.js` — entrance, manager walk, music
+- `src/park.js` — 3D park, cameras, ball flight
 - `index.html` — the mound screen
