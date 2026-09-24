@@ -119,11 +119,26 @@ export const CAMERA = {
   gameplayFov: 30,
   gameplayBack: 3.05,
   gameplayHeight: 1.98,
+  gameplayOffCenter: 0.42,
+  lookHeight: 0.8,
   handheldPx: 0.8,
   releaseWhipDeg: 2.5,
   releaseWhipMs: 150,
   ballFollowSeconds: 1.5,
   kFov: 18,
+} as const;
+
+export const LIGHTING = {
+  exposure: 1.08,
+  sunIntensity: 2.4,
+  sunColor: "#ffd2a0",
+  hemiSky: "#c4def5",
+  hemiGround: "#6d7a52",
+  hemiIntensity: 0.72,
+  sun: { x: -38, y: 16, z: 32 },
+  fog: "#c8dbea",
+  fogNear: 90,
+  fogFar: 240,
 } as const;
 
 export const CUTSCENE = {

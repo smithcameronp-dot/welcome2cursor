@@ -2,12 +2,14 @@
 
 Pitch a full 9 innings. Chase a perfect game.
 
-Phase 1 is **headless game logic** only. `src/game/` has no renderer. The older canvas page in this folder is the previous preview, not the spec pipeline.
+Phase 2 is the **behind-the-pitcher camera** and park. No characters yet.
 
 ```bash
 npm test
 npm run dev
 ```
+
+Open `http://127.0.0.1:5173` for the gameplay camera. `legacy.html` is the old dial preview.
 
 ## Layout
 

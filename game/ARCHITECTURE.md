@@ -18,7 +18,7 @@ game/
     outing.ts
     index.ts
   src/data/teams.ts      fictional clubs
-  src/render/            empty until phase 2
+`src/render/` — stadium, gameplay camera, lighting. Characters are phase 3.
   src/ui/                empty until phase 5
   test/*.test.ts
 ```
