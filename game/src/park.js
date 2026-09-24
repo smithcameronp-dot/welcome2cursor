@@ -59,7 +59,7 @@ export function createPark(canvas) {
   rim.position.set(8, 14, 28);
   scene.add(hemi, sun, fill, rim);
 
-  buildField(scene);
+  const { backdrop } = buildField(scene);
   const pitcher = ballplayer({
     jersey: "#f4f6f8",
     pants: "#f4f6f8",
@@ -73,7 +73,7 @@ export function createPark(canvas) {
   const catcher = ballplayer({ jersey: "#1a365c", pants: "#1a365c", cap: "#1a365c", sleeve: "#1a365c", word: "GULLS", number: "8" });
   const umpire = ballplayer({ jersey: "#2a241c", pants: "#1a1814", cap: "#111", sleeve: "#2a241c", word: "", number: "", glove: false, skin: "#c9a07a" });
   const manager = ballplayer({ jersey: "#ff7a3c", pants: "#1a1408", cap: "#1a1408", sleeve: "#1a1408", word: "GULLS", number: "", glove: false });
-  pitcher.userData.moundYaw = 0.18;
+  pitcher.userData.moundYaw = 0.22;
   pitcher.position.set(0, 0.45, MOUND_Z);
   batter.position.set(0.85, 0, 0.55);
   batter.rotation.y = Math.PI;
@@ -111,6 +111,7 @@ export function createPark(canvas) {
   function applyCam(rig) {
     camera.position.copy(rig.pos);
     camera.lookAt(rig.look);
+    backdrop.visible = rig === heroCam;
   }
 
   function resize() {
@@ -163,6 +164,7 @@ export function createPark(canvas) {
     async playIntro({ onCam } = {}) {
       manager.visible = false;
       ball.visible = false;
+      backdrop.visible = false;
       moving = true;
       const dugout = new THREE.Vector3(16.2, 0, 12.2);
       const jump = new THREE.Vector3(9.4, 0, 16.6);
@@ -187,18 +189,19 @@ export function createPark(canvas) {
         } else {
           const u = smooth((t - 0.62) / 0.38);
           pitcher.position.lerpVectors(new THREE.Vector3(6.2, 0.45, 17.4), rubber, u);
-          pitcher.rotation.y = 0.9 - u * (0.9 - (pitcher.userData.moundYaw ?? 0.18));
+          pitcher.rotation.y = 0.9 - u * (0.9 - (pitcher.userData.moundYaw ?? 0.22));
           camera.position.lerpVectors(
             new THREE.Vector3(Math.sin(spin) * radius, 10, Math.cos(spin) * radius + 8),
             heroCam.pos,
             u,
           );
           camera.lookAt(lerp3(new THREE.Vector3(pitcher.position.x, 1.3, pitcher.position.z), heroCam.look, u));
+          backdrop.visible = u > 0.55;
         }
       });
       moving = false;
       pitcher.position.copy(rubber);
-      pitcher.rotation.y = pitcher.userData.moundYaw ?? 0.18;
+      pitcher.rotation.y = pitcher.userData.moundYaw ?? 0.22;
       applyCam(heroCam);
     },
     setPitchingView() {
@@ -206,7 +209,7 @@ export function createPark(canvas) {
       ball.visible = false;
       moving = false;
       pitcher.position.set(0, 0.45, MOUND_Z);
-      pitcher.rotation.y = pitcher.userData.moundYaw ?? 0.18;
+      pitcher.rotation.y = pitcher.userData.moundYaw ?? 0.22;
       applyCam(heroCam);
     },
     setAimView() {
@@ -246,6 +249,7 @@ export function createPark(canvas) {
       applyCam(heroCam);
     },
     async playHook() {
+      backdrop.visible = false;
       manager.visible = true;
       moving = true;
       manager.position.set(16.4, 0, 12.4);
@@ -264,6 +268,7 @@ export function createPark(canvas) {
     },
     seekIntro(t) {
       const u = Math.max(0, Math.min(1, t));
+      backdrop.visible = u > 0.88;
       const dugout = new THREE.Vector3(16.2, 0, 12.2);
       const jump = new THREE.Vector3(9.4, 0, 16.6);
       const rubber = new THREE.Vector3(0, 0.45, MOUND_Z);
@@ -294,6 +299,7 @@ export function createPark(canvas) {
     },
     seekHook(t) {
       const u = Math.max(0, Math.min(1, t));
+      backdrop.visible = false;
       manager.visible = true;
       const start = new THREE.Vector3(16.4, 0, 12.4);
       const end = new THREE.Vector3(1.1, 0.45, MOUND_Z + 0.35);
@@ -429,7 +435,8 @@ function buildField(scene) {
   const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(78, 32), new THREE.MeshBasicMaterial({ map: stadiumMap }));
   backdrop.position.set(2.4, 13.4, 33.5);
   backdrop.rotation.y = Math.PI;
-  scene.add(backdrop);
+      scene.add(backdrop);
+      return { backdrop };
 
   const dug = box(6.4, 1.4, 2.2, "#2a241c");
   dug.position.set(16.6, 0.7, 12.2);

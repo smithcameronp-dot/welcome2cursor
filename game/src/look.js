@@ -170,14 +170,13 @@ export function skyTex() {
 
 export function jerseyTex({ word = "GULLS", number = "21", color = "#f4f6f8", ink = "#1a365c" }) {
   return canvas(512, 512, (ctx, w, h) => {
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = ink;
-    ctx.font = "900 70px Arial, sans-serif";
+    ctx.font = "900 68px Arial, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(word, w / 2, 168);
-    ctx.font = "900 210px Arial, sans-serif";
-    ctx.fillText(number, w / 2, 400);
+    ctx.fillText(word, w / 2, 150);
+    ctx.font = "900 200px Arial, sans-serif";
+    ctx.fillText(number, w / 2, 390);
   });
 }
 
@@ -219,20 +218,25 @@ export function ballplayer({
   const torso = new THREE.Group();
   torso.position.y = 0;
 
-  const shirt = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.62, 16), std(jersey, { roughness: 0.84 }));
+  const shirt = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.24, 0.6, 16), std(jersey, { roughness: 0.84 }));
   shirt.position.y = 1.2;
+  shirt.scale.set(1.18, 1, 0.72);
   shirt.castShadow = true;
-  shirt.scale.set(1.15, 1, 0.82);
 
   const decal = new THREE.Mesh(
     new THREE.PlaneGeometry(0.34, 0.4),
     new THREE.MeshStandardMaterial({
       map: jerseyTex({ word, number, color: jersey, ink: cap }),
+      transparent: true,
+      depthWrite: false,
       roughness: 0.88,
       metalness: 0,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2,
     }),
   );
-  decal.position.set(0, 1.2, -0.22);
+  decal.position.set(0, 1.18, -0.16);
   decal.rotation.y = Math.PI;
 
   const collar = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.018, 8, 16, Math.PI), std(jersey));
@@ -255,9 +259,9 @@ export function ballplayer({
   rShoe.position.set(0.1, 0.045, 0.1);
 
   const lArm = limb(0.052, 0.4, sleeve);
-  lArm.position.set(-0.3, 1.22, 0.02);
+  lArm.position.set(0.32, 1.22, -0.05);
   const rArm = limb(0.052, 0.4, sleeve);
-  rArm.position.set(0.3, 1.22, 0.02);
+  rArm.position.set(-0.32, 1.22, 0.06);
 
   const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.062, 0.1, 10), std(skin, { roughness: 0.48 }));
   neck.position.y = 1.54;
@@ -288,11 +292,25 @@ export function ballplayer({
   const bill = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.02, 0.15), capMat);
   bill.position.set(0, 1.745, -0.15);
   const logo = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.08, 0.08),
-    new THREE.MeshStandardMaterial({ map: capTex(cap), roughness: 0.55 }),
+    new THREE.PlaneGeometry(0.1, 0.1),
+    new THREE.MeshStandardMaterial({ map: capTex(cap), roughness: 0.55, transparent: false }),
   );
-  logo.position.set(0, 1.78, -0.12);
+  logo.position.set(0, 1.74, -0.14);
   logo.rotation.y = Math.PI;
+
+  if (number) {
+    const back = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.3, 0.34),
+      new THREE.MeshStandardMaterial({
+        map: jerseyTex({ word: "", number, color: jersey, ink: cap }),
+        transparent: true,
+        depthWrite: false,
+        roughness: 0.88,
+      }),
+    );
+    back.position.set(0, 1.22, 0.16);
+    torso.add(back);
+  }
 
   torso.add(shirt, decal, collar);
   root.add(
@@ -331,13 +349,13 @@ export function ballplayer({
   if (stance === "stretch") {
     lLeg.rotation.x = -0.22;
     rLeg.rotation.x = 0.16;
-    lArm.rotation.set(0.95, 0.15, 0.55);
-    rArm.rotation.set(0.72, -0.1, -0.35);
-    torso.rotation.y = 0.12;
-    root.rotation.y = 0.18;
+    lArm.rotation.set(-0.85, 0.05, 0.28);
+    rArm.rotation.set(-0.3, 0.45, -0.2);
+    torso.rotation.y = 0.08;
+    root.rotation.y = 0.22;
   } else {
-    lArm.rotation.z = 0.16;
-    rArm.rotation.z = -0.2;
+    lArm.rotation.z = -0.16;
+    rArm.rotation.z = 0.2;
     rArm.rotation.x = 0.28;
   }
 
