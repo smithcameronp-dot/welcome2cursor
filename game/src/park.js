@@ -1,4 +1,5 @@
 import * as THREE from "../vendor/three.module.js";
+import { ballplayer, crowdTex, dirtTex, grassTex, idle, skyTex, stadiumTex, walk } from "./look.js";
 
 const MOUND_Z = 18.4;
 const FIRST = 27.4;
@@ -14,33 +15,6 @@ function box(w, h, d, color, extras) {
   return mesh;
 }
 
-function cyl(rTop, rBot, h, color, segs = 16) {
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, h, segs), mat(color));
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-function figure({ jersey = "#f4f1ea", pants = "#1c3a66", cap = "#12325a", skin = "#efd0b0", visor = "#0d1b2a" }) {
-  const root = new THREE.Group();
-  const legs = box(0.28, 0.7, 0.2, pants);
-  legs.position.y = 0.35;
-  const torso = box(0.38, 0.55, 0.24, jersey);
-  torso.position.y = 0.95;
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 12), mat(skin, { roughness: 0.55 }));
-  head.position.y = 1.38;
-  head.castShadow = true;
-  const hat = cyl(0.17, 0.17, 0.1, cap, 12);
-  hat.position.y = 1.5;
-  const bill = box(0.18, 0.03, 0.16, visor);
-  bill.position.set(0, 1.47, -0.14);
-  const glove = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), mat("#6b4a2a"));
-  glove.position.set(0.28, 0.95, 0.08);
-  root.add(legs, torso, head, hat, bill, glove);
-  root.userData.glove = glove;
-  return root;
-}
-
 function lerp3(a, b, t) {
   return new THREE.Vector3().lerpVectors(a, b, t);
 }
@@ -51,39 +25,56 @@ function smooth(t) {
 }
 
 export function createPark(canvas) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, failIfMajorPerformanceCaveat: false });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, failIfMajorPerformanceCaveat: false });
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.28;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color("#6ea6d4");
-  scene.fog = new THREE.Fog("#8eb7d4", 40, 160);
+  scene.fog = new THREE.Fog("#c5def0", 90, 240);
 
-  const camera = new THREE.PerspectiveCamera(42, 16 / 9, 0.1, 400);
-  const look = new THREE.Vector3(0, 1.05, 1.2);
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(180, 24, 16),
+    new THREE.MeshBasicMaterial({ map: skyTex(), side: THREE.BackSide }),
+  );
+  scene.add(sky);
 
-  const hemi = new THREE.HemisphereLight("#d7ecff", "#3d5a32", 0.95);
-  const sun = new THREE.DirectionalLight("#fff3d6", 1.35);
-  sun.position.set(-24, 36, -8);
+  const camera = new THREE.PerspectiveCamera(18, 16 / 9, 0.1, 400);
+
+  const hemi = new THREE.HemisphereLight("#e7f3ff", "#6f7d52", 0.95);
+  const sun = new THREE.DirectionalLight("#fff4d8", 2.45);
+  sun.position.set(-22, 36, 4);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024);
-  sun.shadow.camera.left = -40;
-  sun.shadow.camera.right = 40;
-  sun.shadow.camera.top = 40;
-  sun.shadow.camera.bottom = -40;
-  scene.add(hemi, sun);
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.left = -50;
+  sun.shadow.camera.right = 50;
+  sun.shadow.camera.top = 50;
+  sun.shadow.camera.bottom = -50;
+  sun.shadow.bias = -0.0002;
+  const fill = new THREE.DirectionalLight("#c5dcf4", 0.7);
+  fill.position.set(18, 10, -14);
+  const rim = new THREE.DirectionalLight("#fff1c8", 0.35);
+  rim.position.set(8, 14, 28);
+  scene.add(hemi, sun, fill, rim);
 
   buildField(scene);
-  const pitcher = figure({ jersey: "#f4f1ea", pants: "#1c3a66", cap: "#12325a" });
-  const batter = figure({ jersey: "#cfd3d8", pants: "#2c2c32", cap: "#8a3a3a" });
-  const catcher = figure({ jersey: "#1c3a66", pants: "#1c3a66", cap: "#12325a" });
-  const umpire = figure({ jersey: "#2a241c", pants: "#1a1814", cap: "#111", visor: "#111" });
-  const manager = figure({ jersey: "#ff7a3c", pants: "#1a1408", cap: "#1a1408" });
+  const pitcher = ballplayer({
+    jersey: "#f4f6f8",
+    pants: "#f4f6f8",
+    cap: "#1a365c",
+    sleeve: "#1a365c",
+    word: "GULLS",
+    number: "21",
+    stance: "stretch",
+  });
+  const batter = ballplayer({ jersey: "#e8e4dc", pants: "#2c2c32", cap: "#6b2f2f", sleeve: "#6b2f2f", word: "OTTERS", number: "2", glove: false });
+  const catcher = ballplayer({ jersey: "#1a365c", pants: "#1a365c", cap: "#1a365c", sleeve: "#1a365c", word: "GULLS", number: "8" });
+  const umpire = ballplayer({ jersey: "#2a241c", pants: "#1a1814", cap: "#111", sleeve: "#2a241c", word: "", number: "", glove: false, skin: "#c9a07a" });
+  const manager = ballplayer({ jersey: "#ff7a3c", pants: "#1a1408", cap: "#1a1408", sleeve: "#1a1408", word: "GULLS", number: "", glove: false });
+  pitcher.userData.moundYaw = 0.18;
   pitcher.position.set(0, 0.45, MOUND_Z);
-  pitcher.rotation.y = 0;
   batter.position.set(0.85, 0, 0.55);
   batter.rotation.y = Math.PI;
   catcher.position.set(0, 0, -1.35);
@@ -101,19 +92,26 @@ export function createPark(canvas) {
 
   const zone = new THREE.Mesh(
     new THREE.PlaneGeometry(0.48, 0.7),
-    new THREE.MeshBasicMaterial({ color: "#e2b15a", transparent: true, opacity: 0.22, side: THREE.DoubleSide }),
+    new THREE.MeshBasicMaterial({ color: "#e2b15a", transparent: true, opacity: 0.18, side: THREE.DoubleSide }),
   );
   zone.position.set(0, 0.95, 0.15);
   scene.add(zone);
 
+  const heroCam = { pos: new THREE.Vector3(-5.8, 0.86, 12.4), look: new THREE.Vector3(0.08, 1.42, 18.55) };
   const pitchCam = { pos: new THREE.Vector3(1.55, 2.25, 27.8), look: new THREE.Vector3(0, 0.92, 0.35) };
-  camera.position.copy(pitchCam.pos);
-  camera.lookAt(pitchCam.look);
+  camera.position.copy(heroCam.pos);
+  camera.lookAt(heroCam.look);
 
   let raf = 0;
   let anim = null;
   let cancelPlay = null;
+  let moving = false;
   const clock = new THREE.Clock();
+
+  function applyCam(rig) {
+    camera.position.copy(rig.pos);
+    camera.lookAt(rig.look);
+  }
 
   function resize() {
     const w = Math.max(1, canvas.clientWidth);
@@ -126,7 +124,9 @@ export function createPark(canvas) {
   function tick() {
     raf = requestAnimationFrame(tick);
     const dt = Math.min(0.05, clock.getDelta());
-    if (anim) anim(dt, clock.elapsedTime);
+    const t = clock.elapsedTime;
+    if (anim) anim(dt, t);
+    if (!moving) idle(pitcher, t);
     renderer.render(scene, camera);
   }
 
@@ -160,13 +160,10 @@ export function createPark(canvas) {
     setBatterHand(hand) {
       batter.position.x = hand === "L" ? -0.85 : 0.85;
     },
-    setClubColor(hex) {
-      batter.children[2].material.color.set(hex);
-    },
     async playIntro({ onCam } = {}) {
       manager.visible = false;
       ball.visible = false;
-      pitcher.visible = true;
+      moving = true;
       const dugout = new THREE.Vector3(16.2, 0, 12.2);
       const jump = new THREE.Vector3(9.4, 0, 16.6);
       const rubber = new THREE.Vector3(0, 0.45, MOUND_Z);
@@ -175,48 +172,54 @@ export function createPark(canvas) {
         if (onCam) onCam(t < 0.38 ? "CAM 1" : t < 0.68 ? "CAM 2" : "CAM 3");
         const spin = t * Math.PI * 2.15;
         const radius = 34 - t * 10;
-        camera.position.set(Math.sin(spin) * radius, 18 - t * 8, Math.cos(spin) * radius + 10);
-        camera.lookAt(0, 0.4, 12);
+        walk(pitcher, t * 12);
         if (t < 0.48) {
           pitcher.position.lerpVectors(dugout, jump, smooth(t / 0.48));
           pitcher.position.y = 0;
+          camera.position.set(Math.sin(spin) * radius, 18 - t * 8, Math.cos(spin) * radius + 10);
+          camera.lookAt(pitcher.position.x, 1.2, pitcher.position.z);
         } else if (t < 0.62) {
           const u = smooth((t - 0.48) / 0.14);
           pitcher.position.lerpVectors(jump, new THREE.Vector3(6.2, 0, 17.4), u);
           pitcher.position.y = Math.sin(u * Math.PI) * 1.35;
+          camera.position.set(Math.sin(spin) * radius, 14 - t * 6, Math.cos(spin) * radius + 8);
+          camera.lookAt(pitcher.position.x, 1.2, pitcher.position.z);
         } else {
           const u = smooth((t - 0.62) / 0.38);
           pitcher.position.lerpVectors(new THREE.Vector3(6.2, 0.45, 17.4), rubber, u);
-          pitcher.rotation.y = 0.5 - u * 0.5;
+          pitcher.rotation.y = 0.9 - u * (0.9 - (pitcher.userData.moundYaw ?? 0.18));
           camera.position.lerpVectors(
-            new THREE.Vector3(Math.sin(spin) * radius, 18 - t * 8, Math.cos(spin) * radius + 10),
-            pitchCam.pos,
+            new THREE.Vector3(Math.sin(spin) * radius, 10, Math.cos(spin) * radius + 8),
+            heroCam.pos,
             u,
           );
-          const lookNow = lerp3(new THREE.Vector3(0, 0.4, 12), pitchCam.look, u);
-          camera.lookAt(lookNow);
+          camera.lookAt(lerp3(new THREE.Vector3(pitcher.position.x, 1.3, pitcher.position.z), heroCam.look, u));
         }
       });
+      moving = false;
       pitcher.position.copy(rubber);
-      pitcher.rotation.y = 0;
-      camera.position.copy(pitchCam.pos);
-      camera.lookAt(pitchCam.look);
+      pitcher.rotation.y = pitcher.userData.moundYaw ?? 0.18;
+      applyCam(heroCam);
     },
     setPitchingView() {
       manager.visible = false;
       ball.visible = false;
+      moving = false;
       pitcher.position.set(0, 0.45, MOUND_Z);
-      pitcher.rotation.y = 0;
-      camera.position.copy(pitchCam.pos);
-      camera.lookAt(pitchCam.look);
+      pitcher.rotation.y = pitcher.userData.moundYaw ?? 0.18;
+      applyCam(heroCam);
+    },
+    setAimView() {
+      applyCam(pitchCam);
     },
     async throwPitch({ type, location, error, late, outcome, bats }) {
+      applyCam(pitchCam);
       const start = new THREE.Vector3(-0.22, 1.32, MOUND_Z - 0.55);
       const end = zonePoint(location, error, late, bats);
       const mid = breakPoint(start, end, type, late);
       ball.visible = true;
       ball.position.copy(start);
-      pitcher.rotation.x = -0.18;
+      if (pitcher.userData.rArm) pitcher.userData.rArm.rotation.x = -1.1;
       await play(speedMs(type, error), (t) => {
         const a = lerp3(start, mid, t);
         const b = lerp3(mid, end, t);
@@ -224,7 +227,9 @@ export function createPark(canvas) {
         ball.position.y += Math.sin(t * Math.PI) * 0.08;
         if (swings(outcome) && t > 0.72) batter.rotation.y = bats === "L" ? 0.7 : -0.7;
       });
-      pitcher.rotation.x = 0;
+      if (pitcher.userData.rArm) {
+        pitcher.userData.rArm.rotation.x = pitcher.userData.pose?.rArmX ?? 0.35;
+      }
       await play(420, (t) => {
         if (outcome === "groundout") ball.position.y = 0.08;
         if (outcome === "flyout" || outcome === "homer" || outcome === "double" || outcome === "single") {
@@ -236,22 +241,26 @@ export function createPark(canvas) {
           ball.position.y += t * 5;
         }
       });
-      batter.rotation.y = 0;
+      batter.rotation.y = Math.PI;
       ball.visible = false;
+      applyCam(heroCam);
     },
     async playHook() {
       manager.visible = true;
+      moving = true;
       manager.position.set(16.4, 0, 12.4);
       const start = manager.position.clone();
       const end = new THREE.Vector3(1.1, 0.45, MOUND_Z + 0.35);
-      camera.position.set(8.5, 4.2, 28);
-      camera.lookAt(0, 0.8, MOUND_Z);
+      camera.position.set(-2.4, 1.7, 15.8);
+      camera.lookAt(0.2, 1.4, MOUND_Z);
       await play(4800, (t) => {
         manager.position.lerpVectors(start, end, smooth(t));
         manager.lookAt(pitcher.position);
-        camera.position.lerp(new THREE.Vector3(4.2, 2.4, 24.5), 0.04);
-        camera.lookAt(0.4, 1.1, MOUND_Z);
+        walk(manager, t * 14);
+        camera.position.lerp(new THREE.Vector3(-1.8, 1.55, 16.4), 0.03);
+        camera.lookAt(0.3, 1.45, MOUND_Z);
       });
+      moving = false;
     },
     seekIntro(t) {
       const u = Math.max(0, Math.min(1, t));
@@ -264,23 +273,23 @@ export function createPark(canvas) {
         pitcher.position.lerpVectors(dugout, jump, smooth(u / 0.48));
         pitcher.position.y = 0;
         camera.position.set(Math.sin(spin) * radius, 18 - u * 8, Math.cos(spin) * radius + 10);
-        camera.lookAt(0, 0.4, 12);
+        camera.lookAt(pitcher.position.x, 1.2, pitcher.position.z);
       } else if (u < 0.62) {
         const j = smooth((u - 0.48) / 0.14);
         pitcher.position.lerpVectors(jump, new THREE.Vector3(6.2, 0, 17.4), j);
         pitcher.position.y = Math.sin(j * Math.PI) * 1.35;
-        camera.position.set(Math.sin(spin) * radius, 18 - u * 8, Math.cos(spin) * radius + 10);
-        camera.lookAt(0, 0.4, 12);
+        camera.position.set(Math.sin(spin) * radius, 14 - u * 6, Math.cos(spin) * radius + 8);
+        camera.lookAt(pitcher.position.x, 1.2, pitcher.position.z);
       } else {
         const w = smooth((u - 0.62) / 0.38);
         pitcher.position.lerpVectors(new THREE.Vector3(6.2, 0.45, 17.4), rubber, w);
-        pitcher.rotation.y = 0.5 - w * 0.5;
+        pitcher.rotation.y = 0.9 - w * (0.9 - (pitcher.userData.moundYaw ?? 0.18));
         camera.position.lerpVectors(
-          new THREE.Vector3(Math.sin(spin) * radius, 18 - u * 8, Math.cos(spin) * radius + 10),
-          pitchCam.pos,
+          new THREE.Vector3(Math.sin(spin) * radius, 10, Math.cos(spin) * radius + 8),
+          heroCam.pos,
           w,
         );
-        camera.lookAt(lerp3(new THREE.Vector3(0, 0.4, 12), pitchCam.look, w));
+        camera.lookAt(lerp3(new THREE.Vector3(pitcher.position.x, 1.3, pitcher.position.z), heroCam.look, w));
       }
     },
     seekHook(t) {
@@ -290,8 +299,8 @@ export function createPark(canvas) {
       const end = new THREE.Vector3(1.1, 0.45, MOUND_Z + 0.35);
       manager.position.lerpVectors(start, end, smooth(u));
       pitcher.position.set(0, 0.45, MOUND_Z);
-      camera.position.set(8.5 - u * 4.3, 4.2 - u * 1.8, 28 - u * 3.5);
-      camera.lookAt(0.4, 1.1, MOUND_Z);
+      camera.position.set(-2.4 + u * 0.6, 1.7 - u * 0.15, 15.8 + u * 0.6);
+      camera.lookAt(0.3, 1.45, MOUND_Z);
     },
     skip() {
       if (cancelPlay) cancelPlay();
@@ -331,41 +340,38 @@ function speedMs(type, error) {
 }
 
 function swings(outcome) {
-  return [
-    "swinging-strike",
-    "foul",
-    "groundout",
-    "flyout",
-    "single",
-    "double",
-    "homer",
-  ].includes(outcome);
+  return ["swinging-strike", "foul", "groundout", "flyout", "single", "double", "homer"].includes(outcome);
 }
 
 function buildField(scene) {
-  const grass = new THREE.Mesh(new THREE.CircleGeometry(95, 64), mat("#1f7a43"));
+  const grassMap = grassTex();
+  grassMap.wrapS = grassMap.wrapT = THREE.RepeatWrapping;
+  grassMap.repeat.set(18, 18);
+  const grass = new THREE.Mesh(new THREE.CircleGeometry(95, 64), mat("#2f8a3e", { map: grassMap }));
   grass.rotation.x = -Math.PI / 2;
   grass.receiveShadow = true;
   scene.add(grass);
 
+  const dirtMap = dirtTex();
+  dirtMap.wrapS = dirtMap.wrapT = THREE.RepeatWrapping;
+  dirtMap.repeat.set(6, 6);
   const dirtShape = new THREE.Shape();
   dirtShape.moveTo(0, 0);
   dirtShape.lineTo(22, 22);
   dirtShape.lineTo(0, 38.8);
   dirtShape.lineTo(-22, 22);
   dirtShape.closePath();
-  const dirt = new THREE.Mesh(new THREE.ShapeGeometry(dirtShape), mat("#8d5a32"));
+  const dirt = new THREE.Mesh(new THREE.ShapeGeometry(dirtShape), mat("#c48a4a", { map: dirtMap, side: THREE.DoubleSide }));
   dirt.rotation.x = Math.PI / 2;
   dirt.position.y = 0.02;
-  dirt.material.side = THREE.DoubleSide;
   dirt.receiveShadow = true;
   scene.add(dirt);
 
-  const mound = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 3.4, 0.45, 24), mat("#c9854a"));
+  const mound = new THREE.Mesh(new THREE.CylinderGeometry(2.6, 3.4, 0.45, 28), mat("#c48a4a", { map: dirtMap }));
   mound.position.set(0, 0.22, MOUND_Z);
   mound.receiveShadow = true;
   scene.add(mound);
-  const rubber = box(0.6, 0.04, 0.14, "#f4efe6");
+  const rubber = box(0.61, 0.03, 0.15, "#f4efe6");
   rubber.position.set(0, 0.47, MOUND_Z);
   scene.add(rubber);
 
@@ -394,38 +400,36 @@ function buildField(scene) {
   right.rotation.y = -Math.PI / 4;
   scene.add(left, right);
 
-  const wall = new THREE.Mesh(
-    new THREE.CylinderGeometry(78, 78, 3.2, 48, 1, true),
-    mat("#6d5838"),
-  );
-  wall.position.y = 1.6;
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(46, 46, 3.4, 64, 1, true), mat("#1a365c"));
+  wall.position.y = 1.7;
   scene.add(wall);
 
+  const crowdMap = crowdTex();
+  crowdMap.wrapS = THREE.RepeatWrapping;
+  crowdMap.repeat.set(3, 1);
   const stands = new THREE.Mesh(
-    new THREE.CylinderGeometry(88, 80, 12, 48, 1, true),
-    mat("#243044"),
+    new THREE.CylinderGeometry(58, 46, 16, 64, 1, true),
+    new THREE.MeshStandardMaterial({ map: crowdMap, roughness: 0.95 }),
   );
-  stands.position.y = 8;
+  stands.position.y = 10;
   scene.add(stands);
 
-  const crowdGeo = new THREE.BoxGeometry(0.45, 0.85, 0.4);
-  const crowdMat = new THREE.MeshStandardMaterial({ color: "#d7c4a4", roughness: 0.9 });
-  const crowd = new THREE.InstancedMesh(crowdGeo, crowdMat, 420);
-  const dummy = new THREE.Object3D();
-  let i = 0;
-  for (let ring = 0; ring < 6; ring += 1) {
-    const r = 80 + ring * 1.15;
-    const count = 52 + ring * 6;
-    for (let n = 0; n < count && i < 420; n += 1) {
-      const a = (n / count) * Math.PI * 1.65 + 0.55;
-      dummy.position.set(Math.sin(a) * r, 2.6 + ring * 1.35, Math.cos(a) * r);
-      dummy.updateMatrix();
-      crowd.setMatrixAt(i, dummy.matrix);
-      i += 1;
-    }
-  }
-  crowd.instanceMatrix.needsUpdate = true;
-  scene.add(crowd);
+  const deck = new THREE.Mesh(
+    new THREE.CylinderGeometry(66, 58, 9, 64, 1, true),
+    new THREE.MeshStandardMaterial({ map: crowdMap, roughness: 0.95 }),
+  );
+  deck.position.y = 21;
+  scene.add(deck);
+
+  const fascia = new THREE.Mesh(new THREE.CylinderGeometry(46, 46, 1.4, 64, 1, true), mat("#d9e2ea"));
+  fascia.position.y = 3.4;
+  scene.add(fascia);
+
+  const stadiumMap = stadiumTex();
+  const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(78, 32), new THREE.MeshBasicMaterial({ map: stadiumMap }));
+  backdrop.position.set(2.4, 13.4, 33.5);
+  backdrop.rotation.y = Math.PI;
+  scene.add(backdrop);
 
   const dug = box(6.4, 1.4, 2.2, "#2a241c");
   dug.position.set(16.6, 0.7, 12.2);
@@ -436,4 +440,8 @@ function buildField(scene) {
   const dugRoof2 = dugRoof.clone();
   dugRoof2.position.x = -16.6;
   scene.add(dug, dugRoof, dug2, dugRoof2);
+
+  const board = box(16, 7, 0.4, "#1d3a66");
+  board.position.set(0, 22, 56);
+  scene.add(board);
 }

@@ -247,6 +247,8 @@ h2 { font-size: 48px; }
   z-index: 3;
 }
 
+#stage.pitching .zone { display: none; }
+#stage.aiming .zone { display: grid; }
 #stage.pitching #skip,
 #stage.intro .card,
 #stage.intro .dock,
@@ -263,7 +265,9 @@ h2 { font-size: 48px; }
 #stage.hook #inning,
 #stage.hook #line { display: none; }
 
-#stage.pitching #cam-bug { display: none; }
+#stage.pitching #cam-bug,
+#stage.aiming #skip,
+#stage.aiming #cam-bug { display: none; }
 #stage.intro #cam-bug,
 #stage.hook #cam-bug { display: inline-block; }
 

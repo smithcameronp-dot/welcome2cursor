@@ -30,4 +30,5 @@ The suite checks the count, the hook thresholds, and that average pitching lands
 - `data/teams.js` — Gulls pitcher and the four lineups
 - `src/resolve.js` — pitch outcomes, runs, and the hook
 - `src/park.js` — 3D park, cameras, ball flight
+- `src/look.js` — uniforms, crowd, and stadium textures
 - `index.html` — the mound screen

@@ -191,6 +191,8 @@ function choosePitch(id) {
   renderPitches();
   paintWindow(id);
   $("call").textContent = "Pick a spot";
+  setMode("aiming");
+  ensurePark().setAimView();
 }
 
 function chooseLocation(button) {
@@ -283,6 +285,8 @@ async function finishPitch() {
     return;
   }
   for (const cell of $("zone").children) cell.classList.remove("picked");
+  setMode("pitching");
+  ensurePark().setPitchingView();
 }
 
 function showResult() {
