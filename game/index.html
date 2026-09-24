@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Bullpen Save</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <p id="rotate">Rotate to landscape to pitch.</p>
+    <div id="app">
+      <section id="menu">
+        <div class="menu-copy">
+          <p class="eyebrow">San Antonio Gulls</p>
+          <h1>Bullpen Save</h1>
+          <p>Twenty-seven outs. Nobody on. Miss the dial and the ball hangs.</p>
+        </div>
+        <div id="teams" class="team-list"></div>
+      </section>
+
+      <section id="stage" hidden>
+        <canvas id="gl"></canvas>
+        <header class="scorebug">
+          <span id="cam-bug" class="cam-bug" hidden>CAM 1</span>
+          <span id="inning">Inning 1</span>
+          <span id="count" class="count"></span>
+          <span id="line"></span>
+          <span id="perfect" class="perfect">Perfect</span>
+        </header>
+        <aside id="pitcher-card" class="card card-left"></aside>
+        <aside id="batter-card" class="card card-right"></aside>
+        <div id="zone" class="zone"></div>
+        <p id="call" aria-live="polite"></p>
+        <footer class="dock">
+          <div id="pitches" class="pitches"></div>
+          <div class="dial-wrap">
+            <svg id="dial" viewBox="0 0 200 130" aria-hidden="true">
+              <path id="dial-track" d="" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8" stroke-linecap="round" />
+              <path id="dial-window" d="" fill="none" stroke="#e2b15a" stroke-width="10" stroke-linecap="round" />
+              <line id="dial-needle" x1="100" y1="108" x2="100" y2="36" stroke="#f4f1ea" stroke-width="3" stroke-linecap="round" />
+            </svg>
+            <button id="stop" type="button" disabled>Stop</button>
+          </div>
+        </footer>
+        <button id="skip" type="button">Skip</button>
+      </section>
+
+      <section id="result" hidden>
+        <div class="result-card">
+          <p id="result-kicker" class="eyebrow"></p>
+          <h2 id="result-title"></h2>
+          <p id="result-line"></p>
+          <button id="again" type="button">Face another club</button>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
